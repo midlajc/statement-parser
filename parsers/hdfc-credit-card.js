@@ -68,16 +68,19 @@ function parseNewLine(rawLine) {
     }
   }
 
+  let refNote = "";
+  if (forexAmount && forexCurrency !== "INR" && forexRate) {
+    refNote = `Forex: ${forexAmount} ${forexCurrency} @ ${forexRate}`;
+  }
+
   return [
     {
       date: datePart,
-      time: timePart || "",
+      withdrawals: txnType === "Dr" ? (amount ?? "") : "",
+      deposits: txnType === "Cr" ? (amount ?? "") : "",
+      payee: "",
       description,
-      amount: amount ?? "",
-      currency: forexCurrency,
-      forex_amount: forexAmount ?? "",
-      forex_rate: forexRate,
-      type: txnType,
+      reference_number: refNote,
     },
   ];
 }
@@ -116,16 +119,21 @@ function parseOldLine(rawLine, section) {
     }
   }
 
+  const amount = cleanAmount(amountStr) ?? "";
+
+  let refNote = "";
+  if (forexAmount && currency !== "INR" && forexRate) {
+    refNote = `Forex: ${forexAmount} ${currency} @ ${forexRate}`;
+  }
+
   return [
     {
       date: datePart,
-      time: "",
+      withdrawals: txnType === "Dr" ? amount : "",
+      deposits: txnType === "Cr" ? amount : "",
+      payee: "",
       description,
-      amount: cleanAmount(amountStr) ?? "",
-      currency,
-      forex_amount: forexAmount,
-      forex_rate: forexRate,
-      type: txnType,
+      reference_number: refNote,
     },
   ];
 }
@@ -195,10 +203,8 @@ async function parseFile(file, password) {
   return { rows, format };
 }
 
-function getColumns(format) {
-  return format === "new"
-    ? ["date", "time", "currency", "description", "forex_amount", "forex_rate", "amount", "type"]
-    : ["date", "currency", "description", "forex_amount", "forex_rate", "amount", "type"];
+function getColumns() {
+  return ["date", "withdrawals", "deposits", "payee", "description", "reference_number"];
 }
 
 function isValidFile(file) {

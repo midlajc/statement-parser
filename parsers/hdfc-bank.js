@@ -116,12 +116,11 @@ async function parseFile(file) {
 
     rows.push({
       date,
-      narration,
-      ref_no: refNo,
-      value_date: valueDt,
-      withdrawal: withdrawal,
-      deposit: deposit,
-      closing_balance: closingBalance,
+      withdrawals: withdrawal,
+      deposits: deposit,
+      payee: "",
+      description: narration,
+      reference_number: refNo,
     });
   }
 
@@ -137,7 +136,7 @@ async function parseFile(file) {
 }
 
 function getColumns() {
-  return ["date", "narration", "ref_no", "value_date", "withdrawal", "deposit", "closing_balance"];
+  return ["date", "withdrawals", "deposits", "payee", "description", "reference_number"];
 }
 
 function isValidFile(file) {
