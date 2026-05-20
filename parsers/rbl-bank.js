@@ -98,22 +98,21 @@ async function parseFile(file) {
     const date = parseExcelDate(get("transaction date"));
     if (!date || !DATE_RE.test(date)) continue;
 
-    const narration = normalise(get("transaction details"));
-    const refNo = normalise(get("cheque id"));
-    const valueDt = parseExcelDate(get("value date"));
-    const withdrawal = parseAmount(get("withdrawl amt"));
-    const deposit = parseAmount(get("deposit amt"));
+    const description = normalise(get("transaction details"));
+    const referenceNumber = normalise(get("cheque id"));
+    const withdrawals = parseAmount(get("withdrawl amt"));
+    const deposits = parseAmount(get("deposit amt"));
     const closingBalance = parseAmount(get("balance (inr)"));
 
-    if (withdrawal === "" && deposit === "") continue;
+    if (withdrawals === "" && deposits === "") continue;
 
     rows.push({
       date,
-      narration,
-      ref_no: refNo,
-      value_date: valueDt,
-      withdrawal,
-      deposit,
+      withdrawals,
+      deposits,
+      payee: "",
+      description,
+      reference_number: referenceNumber,
       closing_balance: closingBalance,
     });
   }
@@ -149,7 +148,7 @@ function sortByDateThenBalanceChain(rows) {
 function chainByBalance(group) {
   if (group.length <= 1) return group;
 
-  const net = (t) => (Number(t.deposit) || 0) - (Number(t.withdrawal) || 0);
+  const net = (t) => (Number(t.deposits) || 0) - (Number(t.withdrawals) || 0);
   const close = (t) => {
     const v = Number(t.closing_balance);
     return Number.isFinite(v) ? v : null;
@@ -182,7 +181,7 @@ function chainByBalance(group) {
 }
 
 function getColumns() {
-  return ["date", "narration", "ref_no", "value_date", "withdrawal", "deposit", "closing_balance"];
+  return ["date", "withdrawals", "deposits", "payee", "description", "reference_number"];
 }
 
 function isValidFile(file) {
