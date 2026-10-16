@@ -1,10 +1,11 @@
 import hdfcCreditCard from "./parsers/hdfc-credit-card.js";
 import hdfcBank from "./parsers/hdfc-bank.js";
+import hdfcBankPdf from "./parsers/hdfc-bank-pdf.js";
 import rblBank from "./parsers/rbl-bank.js";
 
 /* ── Tool registry ── */
 
-const tools = [hdfcCreditCard, hdfcBank, rblBank];
+const tools = [hdfcCreditCard, hdfcBank, hdfcBankPdf, rblBank];
 
 let activeTool = null;
 
@@ -76,6 +77,15 @@ window.addEventListener("popstate", () => {
 
 /* ── Build tool cards ── */
 
+// ".xls,.xlsx,application/vnd.ms-excel" -> ["XLS", "XLSX"]
+function getFileFormats(tool) {
+  return tool.accept
+    .split(",")
+    .map((type) => type.trim())
+    .filter((type) => type.startsWith("."))
+    .map((ext) => ext.slice(1).toUpperCase());
+}
+
 function renderToolGrid() {
   toolGrid.innerHTML = "";
   for (const tool of tools) {
@@ -83,6 +93,13 @@ function renderToolGrid() {
     node.querySelector(".tool-card-icon").textContent = tool.icon;
     node.querySelector(".tool-card-name").textContent = tool.name;
     node.querySelector(".tool-card-description").textContent = tool.description;
+    const chips = node.querySelector(".tool-card-chips");
+    for (const format of getFileFormats(tool)) {
+      const chip = document.createElement("span");
+      chip.className = "chip";
+      chip.textContent = format;
+      chips.appendChild(chip);
+    }
     node.addEventListener("click", () => showTool(tool));
     toolGrid.appendChild(node);
   }

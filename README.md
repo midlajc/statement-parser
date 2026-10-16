@@ -24,6 +24,16 @@ Parse HDFC bank account statement Excel files (.xls/.xlsx) into CSV.
 - Auto-detects header row in the spreadsheet
 - Supports 2-digit and 4-digit year date formats
 
+### HDFC Bank Account
+
+Parse HDFC bank account statement PDFs into CSV.
+
+- Classic statement and net banking export layouts (auto-detected from the column headers)
+- Password-protected PDFs (asks for password)
+- Multi-line narrations merged into a single row
+- Transaction time column when the statement includes it
+- Withdrawal/deposit columns cross-checked against the running balance
+
 ## Unified CSV Output
 
 All tools produce a consistent CSV format:
