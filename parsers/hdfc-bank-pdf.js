@@ -243,14 +243,20 @@ async function parseFile(file, password) {
 
   reconcileWithBalance(txns);
 
-  const hasTime = txns.some((r) => r.time);
-  return { rows: txns, format: hasTime ? "with-time" : "default" };
+  const result = txns.map((r) => ({
+    date: r.date,
+    withdrawals: r.withdrawal,
+    deposits: r.deposit,
+    payee: "",
+    description: r.narration,
+    reference_number: r.ref_no,
+  }));
+
+  return { rows: result, format: "default" };
 }
 
-function getColumns(format) {
-  return format === "with-time"
-    ? ["date", "time", "narration", "ref_no", "value_date", "withdrawal", "deposit", "closing_balance"]
-    : ["date", "narration", "ref_no", "value_date", "withdrawal", "deposit", "closing_balance"];
+function getColumns() {
+  return ["date", "withdrawals", "deposits", "payee", "description", "reference_number"];
 }
 
 function isValidFile(file) {
